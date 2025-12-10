@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secure Login</title>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #1e1e2f, #34344a);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .login-container {
+      width: 380px;
+      background: #ffffff;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #222;
+      font-size: 26px;
+      font-weight: 600;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      font-size: 14px;
+      color: #555;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 12px;
+      margin-top: 5px;
+      border-radius: 10px;
+      border: 1px solid #cccccc;
+      font-size: 15px;
+      outline: none;
+      transition: 0.3s;
+    }
+
+    .input-group input:focus {
+      border-color: #5a5af7;
+      box-shadow: 0 0 5px rgba(90, 90, 247, 0.4);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #5a5af7;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #4848e0;
+    }
+
+    .alert {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .success { color: green; }
+    .error { color: red; }
+
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <h2>Sign In</h2>
+
+    <form id="loginForm">
+
+      <div class="input-group">
+        <label>Username</label>
+        <input type="text" id="username" placeholder="Enter username" required />
+      </div>
+
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" id="password" placeholder="Enter password" required />
+      </div>
+
+      <button type="submit">Login</button>
+
+      <p id="message" class="alert"></p>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      const messageBox = document.getElementById("message");
+      messageBox.innerHTML = "Checking...";
+      messageBox.className = "alert";
+
+      try {
+        const response = await fetch("http://YOUR_EC2_IP:3000/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await response.json();
+
+        if (data.message === "Login Success") {
+          messageBox.textContent = "Login Successful!";
+          messageBox.className = "alert success";
+        } else {
+          messageBox.textContent = "Invalid Username or Password";
+          messageBox.className = "alert error";
+        }
+
+      } catch (err) {
+        messageBox.textContent = "Server not reachable!";
+        messageBox.className = "alert error";
+      }
+    });
+  </script>
+
+</body>
+</html>
